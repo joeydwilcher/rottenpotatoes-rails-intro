@@ -4,9 +4,9 @@
 %table#movies
   %thead
     %tr
-      %th Movie Title
+      %th{class: ( request.query_parameters["sort"] == "title" ? "hilite" : "" )}= link_to "Movie Title", root_path(:sort => "title")
       %th Rating
-      %th Release Date
+      %th{class: ( request.query_parameters["sort"] == "release_date" ? "hilite" : "" )}= link_to "Release Date", root_path(:sort => "release_date")
       %th More Info
   %tbody
     - @movies.each do |movie|
