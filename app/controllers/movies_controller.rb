@@ -12,10 +12,9 @@ class MoviesController < ApplicationController
 
   def index
     @movies = Movie.all
-    sort = request.query_parameters["sort"]
-    if sort == "title"
+    if params["sort"] == "title"
       @movies.order!(:title)
-    elsif sort == "release_date"
+    elsif params["sort"] == "release_date"
       @movies.order!(:release_date)
     end
   end
