@@ -11,7 +11,15 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = Movie.all.uniq.pluck(:rating).sort
+    included_ratings = params["ratings"] ? params["ratings"].keys : []
+    
+    if included_ratings.empty?
+      @movies = Movie.all
+    elsif
+      @movies = Movie.select { |movie| params["ratings"].keys.include? movie.rating }
+    end
+    
     @title_header_class = ""
     @release_date_header_class = ""
     if params["sort"] == "title"
