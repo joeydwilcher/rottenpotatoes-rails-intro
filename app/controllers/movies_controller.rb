@@ -11,23 +11,34 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.all.uniq.pluck(:rating).sort
-    included_ratings = params["ratings"] ? params["ratings"].keys : []
     
-    if included_ratings.empty?
-      @movies = Movie.all
-    elsif
-      @movies = Movie.select { |movie| params["ratings"].keys.include? movie.rating }
+    #session.clear
+    
+    @all_ratings = Movie.all.uniq.pluck(:rating).sort
+    
+    if session["ratings"] == nil
+      #first access, set up session vars
+      session["ratings"] = Hash[@all_ratings.collect { |rating| [rating, "1"] } ]
     end
+    
+    @included_ratings = params["ratings"] ? params["ratings"] : session["ratings"]
+    session["ratings"] = @included_ratings
+    
+    @movies = Movie.select { |movie| @included_ratings.keys.include? movie.rating }
     
     @title_header_class = ""
     @release_date_header_class = ""
-    if params["sort"] == "title"
-      @movies.order!(:title)
+
+    sort = params["sort"] ? params["sort"] : session["sort"]
+
+    if sort == "title"
+      @movies.sort! {|movie1,movie2| movie1.title <=> movie2.title }
       @title_header_class = "hilite"
-    elsif params["sort"] == "release_date"
-      @movies.order!(:release_date)
+      session["sort"] = "title"
+    elsif sort == "release_date"
+      @movies.sort! {|movie1,movie2| movie1.release_date <=> movie2.release_date }
       @release_date_header_class = "hilite"
+      session["sort"] = "release_date"
     end
   end
 
